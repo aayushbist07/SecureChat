@@ -36,6 +36,7 @@ void ClientMainWindow::setSessionUsername(const QString& username)
 
     socket->connectToHost("127.0.0.1", 8080);
 
+    //checking if the server is on
     if (!socket->waitForConnected(3000)) {
         ui->textEdit_Log->append("❌  Cannot reach server. Start the Server app first, then relaunch the client.");
         ui->label_IdentityDisplay->setText("Logged in as:  " + myUsername + "  |  ⚠ Offline");

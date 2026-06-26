@@ -28,7 +28,7 @@ public:
 private slots:
     void newConnection();
     void Read_Data_From_Socket();
-    void on_push_button_Send_clicked();
+    // void on_push_button_Send_clicked();
     void Client_Disconnected();
 
 private:

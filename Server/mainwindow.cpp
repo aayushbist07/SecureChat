@@ -101,8 +101,8 @@ void MainWindow::Add_New_Client_Connection(QTcpSocket *socket)
 void MainWindow::Read_Data_From_Socket()
 {
     QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
-    if (!socket) return;
 
+    if (!socket) return;
     QByteArray rawIncomingStream = socket->readAll();
     QList<QByteArray> segmentedPackets = rawIncomingStream.split('\n');
 
@@ -263,30 +263,30 @@ void MainWindow::Client_Disconnected()
 
 // ─── Send button ──────────────────────────────────────────────────────────────
 
-void MainWindow::on_push_button_Send_clicked()
-{
-    QString rawMessage = ui->lineEdit_send_message->text().trimmed();
-    QString receiver   = ui->comboBox_Client_List->currentText();
+// void MainWindow::on_push_button_Send_clicked()
+// {
+//     // QString rawMessage = ui->lineEdit_send_message->text().trimmed();
+//    QString receiver   = ui->comboBox_Client_List->currentText();
 
-    if (rawMessage.isEmpty()) return;
+//     if (rawMessage.isEmpty()) return;
 
-    QJsonObject msgObj;
-    msgObj["type"]    = 1;
-    msgObj["payload"] = rawMessage;
+//     QJsonObject msgObj;
+//     msgObj["type"]    = 1;
+//     msgObj["payload"] = rawMessage;
 
-    QByteArray msgPayload = QJsonDocument(msgObj).toJson(QJsonDocument::Compact) + "\n";
+//     QByteArray msgPayload = QJsonDocument(msgObj).toJson(QJsonDocument::Compact) + "\n";
 
-    if (ui->combobox2_Send_Message_type->currentText() == "All") {
-        for (auto client : UserRegistry.values()) {
-            client->socket->write(msgPayload);
-        }
-        log(QString("[SERVER → ALL] %1").arg(rawMessage));
-    } else {
-        if (UserRegistry.contains(receiver)) {
-            UserRegistry[receiver]->socket->write(msgPayload);
-            log(QString("[SERVER → %1] %2").arg(receiver, rawMessage));
-        }
-    }
+//      if (ui->combobox2_Send_Message_type->currentText() == "All") {
+//      for (auto client : UserRegistry.values()) {
+//          client->socket->write(msgPayload);
+//     }
+//       log(QString("[SERVER → ALL] %1").arg(rawMessage));
+//     } else {
+//        if (UserRegistry.contains(receiver)) {
+//           UserRegistry[receiver]->socket->write(msgPayload);
+//           log(QString("[SERVER → %1] %2").arg(receiver, rawMessage));
+//         }
+//      }
 
-    ui->lineEdit_send_message->clear();
-}
+//     // ui->lineEdit_send_message->clear();
+// }
