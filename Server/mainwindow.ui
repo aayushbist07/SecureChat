@@ -19,7 +19,7 @@
 QMainWindow, QWidget {
     background-color: #1c1f27;
     color: #d4dbe8;
-    font-family: "Segoe UI", sans-serif;
+    font-family: &quot;Segoe UI&quot;, sans-serif;
     font-size: 13px;
 }
 
@@ -63,7 +63,7 @@ QTextEdit#textEdit_Event_Log {
     border: 1px solid #1e2330;
     border-radius: 6px;
     color: #4a8a72;
-    font-family: "Consolas", "Courier New", monospace;
+    font-family: &quot;Consolas&quot;, &quot;Courier New&quot;, monospace;
     font-size: 11px;
     padding: 6px;
 }
@@ -149,7 +149,6 @@ QStatusBar {
 }
    </string>
   </property>
-
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="rootLayout">
     <property name="spacing">
@@ -167,18 +166,10 @@ QStatusBar {
     <property name="bottomMargin">
      <number>0</number>
     </property>
-
-    <!-- ══ LEFT PANEL: users + event log ══════════════════════════════ -->
     <item>
      <widget class="QFrame" name="leftPanel">
-      <property name="minimumWidth">
-       <number>210</number>
-      </property>
-      <property name="maximumWidth">
-       <number>220</number>
-      </property>
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::NoFrame</enum>
       </property>
       <layout class="QVBoxLayout" name="leftLayout">
        <property name="spacing">
@@ -196,8 +187,6 @@ QStatusBar {
        <property name="bottomMargin">
         <number>10</number>
        </property>
-
-       <!-- Users header -->
        <item>
         <widget class="QLabel" name="label_UsersHeader">
          <property name="text">
@@ -205,26 +194,16 @@ QStatusBar {
          </property>
         </widget>
        </item>
-
-       <!-- User list — display only, populated from comboBox_Client_List data in code -->
        <item>
         <widget class="QListWidget" name="listWidget_Users">
-         <property name="minimumHeight">
-          <number>160</number>
-         </property>
-         <property name="maximumHeight">
-          <number>220</number>
-         </property>
          <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
+          <enum>QFrame::Shape::NoFrame</enum>
          </property>
          <property name="alternatingRowColors">
           <bool>false</bool>
          </property>
         </widget>
        </item>
-
-       <!-- Divider spacer -->
        <item>
         <widget class="QLabel" name="label_LogHeader">
          <property name="text">
@@ -232,24 +211,19 @@ QStatusBar {
          </property>
         </widget>
        </item>
-
-       <!-- Event log text area -->
        <item>
         <widget class="QTextEdit" name="textEdit_Event_Log">
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAsNeeded</enum>
-         </property>
         </widget>
        </item>
-
       </layout>
      </widget>
     </item>
-
-    <!-- ══ CENTER: main message log + bottom send bar ════════════════ -->
     <item>
      <layout class="QVBoxLayout" name="centerLayout">
       <property name="spacing">
@@ -267,33 +241,26 @@ QStatusBar {
       <property name="bottomMargin">
        <number>0</number>
       </property>
-
-      <!-- Message log — this is the main textEdit_Client_Messages from original code -->
+      <item>
+       <widget class="QComboBox" name="comboBox_Client_List"/>
+      </item>
       <item>
        <widget class="QTextEdit" name="textEdit_Client_Messages">
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAsNeeded</enum>
         </property>
         <property name="placeholderText">
          <string>Server log will appear here...</string>
         </property>
        </widget>
       </item>
-
-      <!-- Bottom send bar -->
       <item>
        <widget class="QFrame" name="bottomBar">
         <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="minimumHeight">
-         <number>56</number>
-        </property>
-        <property name="maximumHeight">
-         <number>56</number>
+         <enum>QFrame::Shape::NoFrame</enum>
         </property>
         <layout class="QHBoxLayout" name="bottomLayout">
          <property name="spacing">
@@ -311,90 +278,24 @@ QStatusBar {
          <property name="bottomMargin">
           <number>10</number>
          </property>
-
-         <!-- Target user dropdown — comboBox_Client_List (exact name from C++) -->
-         <item>
-          <widget class="QComboBox" name="comboBox_Client_List">
-           <property name="minimumWidth">
-            <number>120</number>
-           </property>
-           <property name="maximumWidth">
-            <number>140</number>
-           </property>
-           <property name="toolTip">
-            <string>Target user</string>
-           </property>
-          </widget>
-         </item>
-
-         <!-- Broadcast mode dropdown — combobox2_Send_Message_type (exact name from C++) -->
-         <item>
-          <widget class="QComboBox" name="combobox2_Send_Message_type">
-           <property name="minimumWidth">
-            <number>70</number>
-           </property>
-           <property name="maximumWidth">
-            <number>80</number>
-           </property>
-           <item>
-            <property name="text">
-             <string>All</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>One</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-
-         <!-- Message input — lineEdit_send_message (exact name from C++) -->
-         <item>
-          <widget class="QLineEdit" name="lineEdit_send_message">
-           <property name="placeholderText">
-            <string>Type a server message...</string>
-           </property>
-          </widget>
-         </item>
-
-         <!-- Send button — push_button_Send (exact name from C++) -->
-         <item>
-          <widget class="QPushButton" name="push_button_Send">
-           <property name="text">
-            <string>Send</string>
-           </property>
-           <property name="maximumWidth">
-            <number>80</number>
-           </property>
-          </widget>
-         </item>
-
         </layout>
        </widget>
       </item>
-
      </layout>
     </item>
-
    </layout>
   </widget>
-
-  <!-- Menu bar -->
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>980</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
-
-  <!-- Status bar -->
   <widget class="QStatusBar" name="statusbar"/>
-
  </widget>
  <resources/>
  <connections/>

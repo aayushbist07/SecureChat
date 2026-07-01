@@ -22,6 +22,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         QtEncryptionEngine.h
+        mainwindow1.h mainwindow1.cpp mainwindow1.ui
+        resource.qrc
     )
 else()
     if(ANDROID)
