@@ -390,6 +390,6 @@ C:/Users/ACER/Desktop/securechat1/SecureChat/Server/mainwindow.h
  mdp:D:/qt_framework/Tools/mingw1310_64/x86_64-w64-mingw32/include/time.h
  mdp:D:/qt_framework/Tools/mingw1310_64/x86_64-w64-mingw32/include/vadefs.h
  mdp:D:/qt_framework/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h
+C:/Users/ACER/Desktop/securechat1/SecureChat/Server/main.cpp
 C:/Users/ACER/Desktop/securechat1/SecureChat/Server/mainwindow.cpp
  uic:./ui_mainwindow.h
-C:/Users/ACER/Desktop/securechat1/SecureChat/Server/main.cpp

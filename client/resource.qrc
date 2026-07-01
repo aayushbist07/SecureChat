@@ -2,6 +2,8 @@
     <qresource prefix="/new/images"/>
     <qresource prefix="/Images"/>
     <qresource prefix="/">
-        <file>images/images.jpg</file>
+        <file>images/images.png</file>
+        <file>images/port.png</file>
+        <file>images/icon.png</file>
     </qresource>
 </RCC>

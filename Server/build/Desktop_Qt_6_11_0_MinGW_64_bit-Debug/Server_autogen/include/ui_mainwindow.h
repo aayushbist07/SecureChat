@@ -37,10 +37,10 @@ public:
     QLabel *label_LogHeader;
     QTextEdit *textEdit_Event_Log;
     QVBoxLayout *centerLayout;
+    QComboBox *comboBox_Client_List;
     QTextEdit *textEdit_Client_Messages;
     QFrame *bottomBar;
     QHBoxLayout *bottomLayout;
-    QComboBox *comboBox_Client_List;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -234,6 +234,11 @@ public:
         centerLayout->setSpacing(0);
         centerLayout->setObjectName("centerLayout");
         centerLayout->setContentsMargins(0, 0, 0, 0);
+        comboBox_Client_List = new QComboBox(centralwidget);
+        comboBox_Client_List->setObjectName("comboBox_Client_List");
+
+        centerLayout->addWidget(comboBox_Client_List);
+
         textEdit_Client_Messages = new QTextEdit(centralwidget);
         textEdit_Client_Messages->setObjectName("textEdit_Client_Messages");
         textEdit_Client_Messages->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
@@ -248,11 +253,6 @@ public:
         bottomLayout->setSpacing(8);
         bottomLayout->setObjectName("bottomLayout");
         bottomLayout->setContentsMargins(12, 10, 12, 10);
-        comboBox_Client_List = new QComboBox(bottomBar);
-        comboBox_Client_List->setObjectName("comboBox_Client_List");
-
-        bottomLayout->addWidget(comboBox_Client_List);
-
 
         centerLayout->addWidget(bottomBar);
 

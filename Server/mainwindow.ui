@@ -242,6 +242,9 @@ QStatusBar {
        <number>0</number>
       </property>
       <item>
+       <widget class="QComboBox" name="comboBox_Client_List"/>
+      </item>
+      <item>
        <widget class="QTextEdit" name="textEdit_Client_Messages">
         <property name="verticalScrollBarPolicy">
          <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
@@ -275,9 +278,6 @@ QStatusBar {
          <property name="bottomMargin">
           <number>10</number>
          </property>
-         <item>
-          <widget class="QComboBox" name="comboBox_Client_List"/>
-         </item>
         </layout>
        </widget>
       </item>
