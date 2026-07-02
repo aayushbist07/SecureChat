@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ClientMainWindow</class>
+ <widget class="QMainWindow" name="ClientMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>860</width>
+    <height>620</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SecureChat — Client</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QMainWindow {
+    background-color: #1a1d23;
+}
+QWidget#centralwidget {
+    background-color: #1a1d23;
+}
+QLabel#label_IdentityDisplay {
+    color: #7ecfb3;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 6px 10px;
+    background-color: #252930;
+    border-radius: 6px;
+    border: 1px solid #2e3340;
+}
+QTextEdit#textEdit_ChatDisplay {
+    background-color: #20242c;
+    color: #dde3ec;
+    font-size: 14px;
+    font-family: "Segoe UI", sans-serif;
+    border: 1px solid #2e3340;
+    border-radius: 8px;
+    padding: 8px;
+}
+QTextEdit#textEdit_Log {
+    background-color: #141720;
+    color: #5a8a72;
+    font-size: 11px;
+    font-family: "Consolas", "Courier New", monospace;
+    border: 1px solid #1e2230;
+    border-radius: 6px;
+    padding: 6px;
+}
+QLineEdit#lineEdit_ChatMsg {
+    background-color: #252930;
+    color: #dde3ec;
+    font-size: 14px;
+    border: 1px solid #3a4050;
+    border-radius: 8px;
+    padding: 8px 12px;
+    selection-background-color: #3d7a5e;
+}
+QLineEdit#lineEdit_ChatMsg:focus {
+    border: 1px solid #7ecfb3;
+}
+QPushButton#sendButton {
+    background-color: #3d7a5e;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+}
+QPushButton#sendButton:hover {
+    background-color: #4d9a74;
+}
+QPushButton#sendButton:pressed {
+    background-color: #2d6a4e;
+}
+QLabel#label_ChatHeader {
+    color: #7ecfb3;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+QLabel#label_LogHeader {
+    color: #4a6a58;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+   </string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_Main">
+    <property name="spacing">
+     <number>10</number>
+    </property>
+    <property name="leftMargin">
+     <number>14</number>
+    </property>
+    <property name="topMargin">
+     <number>12</number>
+    </property>
+    <property name="rightMargin">
+     <number>14</number>
+    </property>
+    <property name="bottomMargin">
+     <number>12</number>
+    </property>
+    <!-- Top: Identity bar -->
+    <item>
+     <widget class="QLabel" name="label_IdentityDisplay">
+      <property name="text">
+       <string>Connecting...</string>
+      </property>
+      <property name="minimumHeight">
+       <number>36</number>
+      </property>
+     </widget>
+    </item>
+    <!-- Middle: Chat + Log side by side -->
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_Middle">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <!-- Left: Chat area -->
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_Chat">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_ChatHeader">
+          <property name="text">
+           <string>CHAT</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="textEdit_ChatDisplay">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <!-- Right: System log -->
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_Log">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_LogHeader">
+          <property name="text">
+           <string>SYSTEM LOG</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="textEdit_Log">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="maximumWidth">
+           <number>280</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <!-- Bottom: Input row -->
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_Input">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_ChatMsg">
+        <property name="placeholderText">
+         <string>Type a message...</string>
+        </property>
+        <property name="minimumHeight">
+         <number>42</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="sendButton">
+        <property name="text">
+         <string>Send</string>
+        </property>
+        <property name="minimumHeight">
+         <number>42</number>
+        </property>
+        <property name="maximumWidth">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>860</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

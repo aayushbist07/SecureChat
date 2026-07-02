@@ -42,7 +42,7 @@ template <> constexpr inline auto MainWindow::qt_create_metaobjectdata<qt_meta_t
         "newConnection",
         "",
         "Read_Data_From_Socket",
-        "on_push_button_Send_clicked"
+        "Client_Disconnected"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -50,7 +50,7 @@ template <> constexpr inline auto MainWindow::qt_create_metaobjectdata<qt_meta_t
         QtMocHelpers::SlotData<void()>(1, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'Read_Data_From_Socket'
         QtMocHelpers::SlotData<void()>(3, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'on_push_button_Send_clicked'
+        // Slot 'Client_Disconnected'
         QtMocHelpers::SlotData<void()>(4, 2, QMC::AccessPrivate, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
@@ -77,7 +77,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         switch (_id) {
         case 0: _t->newConnection(); break;
         case 1: _t->Read_Data_From_Socket(); break;
-        case 2: _t->on_push_button_Send_clicked(); break;
+        case 2: _t->Client_Disconnected(); break;
         default: ;
         }
     }
