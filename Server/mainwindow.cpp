@@ -122,7 +122,7 @@ void MainWindow::Read_Data_From_Socket()
         int messageType = json["type"].toInt();
 
         // ── Type 102: Client registration ────────────────────────────────
-        if (messageType == 102) {
+        if (messageType == CLIENT_REGISTRATION) {
             QString name      = json["username"].toString();
             int clientPubKey  = json["public_key"].toInt();
 
@@ -151,7 +151,7 @@ void MainWindow::Read_Data_From_Socket()
             sendLeaderUpdatedDirectory();
         }
         //Message type 101 normal
-        else if (messageType == 1){
+        else if (messageType == NORMAL_MESSAGE){
             QByteArray forwardPacket =
                 QJsonDocument(json).toJson(QJsonDocument::Compact) + "\n";
 
@@ -166,8 +166,8 @@ void MainWindow::Read_Data_From_Socket()
             log(QString("[CHAT] Relayed encrypted message"));
         }
 
-        // ── Type 105: Leader distributes encrypted session keys ───────────
-        else if (messageType == 105) {
+        // ── Type KEY_DISTRIBUTION : Leader distributes encrypted session keys ───────────
+        else if (messageType == KEY_DISTRIBUTION) {
             int leaderPubKey          = json["leader_public_key"].toInt();
             QJsonArray keyPayloads    = json["key_payloads"].toArray();
 
@@ -180,7 +180,7 @@ void MainWindow::Read_Data_From_Socket()
 
                 if (UserRegistry.contains(targetUser)) {
                     QJsonObject dispatchPacket;
-                    dispatchPacket["type"]             = 105;
+                    dispatchPacket["type"]             = ;
                     dispatchPacket["leader_public_key"] = leaderPubKey;
                     dispatchPacket["encrypted_key"]    = encryptedKeyHex;
 
