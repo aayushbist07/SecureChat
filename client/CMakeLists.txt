@@ -12,9 +12,9 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network)
 
 set(PROJECT_SOURCES
     main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
+    clientmainwindow.cpp
+    clientmainwindow.h
+    clientmainwindow.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -22,7 +22,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         QtEncryptionEngine.h
-        mainwindow1.h mainwindow1.cpp mainwindow1.ui
+        loginwindow.h loginwindow.cpp loginwindow.ui
         resource.qrc
     )
 else()
