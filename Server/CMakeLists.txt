@@ -1,3 +1,11 @@
+# =============================================================================
+# CMakeLists.txt
+# Build configuration for the Server application.
+# Configures the project, finds Qt libraries, builds the executable,
+# and defines installation rules.
+# =============================================================================
+
+cmake_minimum_required(VERSION 3.16)
 cmake_minimum_required(VERSION 3.16)
 
 project(Server VERSION 0.1 LANGUAGES CXX)
