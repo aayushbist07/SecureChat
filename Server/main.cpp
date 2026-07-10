@@ -1,5 +1,6 @@
 // -----------------------------------------------------------------------------
 // main.cpp
+// Entry point of the application.
 #include "mainwindow.h"
 #include <QApplication>
 
