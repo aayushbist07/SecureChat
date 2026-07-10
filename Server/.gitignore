@@ -1,0 +1,6 @@
+#removing dependency folders 
+.qtcreator
+
+build
+
+
