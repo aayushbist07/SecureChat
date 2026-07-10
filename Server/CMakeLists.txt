@@ -65,6 +65,8 @@ target_link_libraries(Server PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Network
 if(${QT_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Server)
 endif()
+
+# Configure application bundle and executable properties.
 set_target_properties(Server PROPERTIES
     ${BUNDLE_ID_OPTION}
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
