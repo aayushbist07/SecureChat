@@ -56,6 +56,7 @@ else()
     endif()
 endif()
 
+# Link the application with the required Qt libraries.
 target_link_libraries(Server PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Network Qt6::Quick)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
