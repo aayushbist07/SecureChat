@@ -75,13 +75,14 @@ set_target_properties(Server PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+# Define installation directories and install rules.
 include(GNUInstallDirs)
 install(TARGETS Server
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
+# Finalize the executable for Qt 6.
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(Server)
 endif()
