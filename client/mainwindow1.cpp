@@ -6,7 +6,6 @@
 #include <QLineEdit>
 #include <QIcon>
 #include <QAction>
-#include "ui_mainwindow.h"
 mainwindow1::mainwindow1(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::mainwindow1)
@@ -20,17 +19,24 @@ void mainwindow1::on_Login_clicked()
 {
     QString username = ui->lineEdit_username->text();
     QString address = ui->lineEdit_address->text();
-    ClientMainWindow *client = new ClientMainWindow();
-    if(!username.isEmpty())
+    if((username.isEmpty() && address.isEmpty()))
+
+        QMessageBox::information(this,"Error" , "No username and address entered");
+    else if(username.isEmpty())
+        QMessageBox::information(this,"Error" , "No username entered");
+    else if(address.isEmpty())
+        QMessageBox::information(this,"Error" , "No address entered");
+    else
     {
         //using the process of non model method
+        ClientMainWindow *client = new ClientMainWindow();
         hide();
-        client->setSessionUsername(username);
+        client->setSessionUsername(username,address);
         client->show();
         close();
-
     }
-    else QMessageBox::information(this , "Username" , "No username entered");
+
+
 
 }
 

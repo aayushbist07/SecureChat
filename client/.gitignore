@@ -82,3 +82,9 @@ CMakeLists.txt.user*
 .uic/
 /build*/
 /.qtcreator/
+ 
+clientmainwindow.h 
+clientmainwindow.cpp 
+clientmainwindow.ui 
+tempCodeRunnerFile.py
+

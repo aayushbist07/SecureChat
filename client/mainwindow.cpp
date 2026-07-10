@@ -29,7 +29,7 @@ ClientMainWindow::~ClientMainWindow()
 void ClientMainWindow::addlog(const QString &message)
 {
     QString time  =  QTime::currentTime().toString("hh:mm:ss");
-    QString LogEntry = QString("[%1] %2").arg(time).arg(message);
+    QString LogEntry = QString("[%1] %2").arg(time,message);
 
     ui->systemLog->addItem(LogEntry);
     ui->systemLog->scrollToBottom();
@@ -42,17 +42,17 @@ void ClientMainWindow::addlog(const QString &message)
 
 
 // ─── Called by main() right after the window is constructed ──────────────────
-void ClientMainWindow::setSessionUsername(const QString& username)
+void ClientMainWindow::setSessionUsername(const QString& username,const QString& HAddr)
 {
     //takes username and sets myUsername 
     myUsername = username;
     setWindowTitle("SecureChat — " + myUsername);
     ui->label_IdentityDisplay->setText(myUsername);
-    addlog("Connecting to 127.0.0.1:8080...");
-    // ui->textEdit_Log->append("Connecting to 127.0.0.1:8080...");
+    QString message = "Connecting to" + HAddr + ":8080";
+    addlog(message);
 
     //calls connectToHost for the QTcpSocket object.
-    socket->connectToHost("127.0.0.1", 8080);
+    socket->connectToHost(HAddr, 8080);
 
     //checking if the server is listening for new clients.
     if (!socket->waitForConnected(3000)) {
