@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QInputDialog>
 #include <QMessageBox>
-#include "mainwindow1.h"
+#include "loginwindow.h"
 
 int main(int argc, char *argv[])
 {

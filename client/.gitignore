@@ -87,6 +87,3 @@ clientmainwindow.h
 clientmainwindow.cpp 
 clientmainwindow.ui 
 tempCodeRunnerFile.py
-loginwindow.cpp
-loginwindow.h
-loginwindow.ui

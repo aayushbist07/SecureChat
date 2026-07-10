@@ -22,7 +22,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         QtEncryptionEngine.h
-        mainwindow1.h mainwindow1.cpp mainwindow1.ui
+        loginwindow.h loginwindow.cpp loginwindow.ui
         resource.qrc
     )
 else()
