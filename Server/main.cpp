@@ -9,5 +9,6 @@ int main(int argc, char *argv[])
      MainWindow w;
      // Display the main window.
     w.show();
+      // Start the Qt event loop.
     return a.exec();
 }
