@@ -5,6 +5,9 @@
 #include <QJsonArray>
 #include <QDateTime>
 #include <QListWidgetItem>
+#include <QNetworkInterface>
+#include <QNetworkAddressEntry>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -14,9 +17,42 @@ MainWindow::MainWindow(QWidget *parent)
 
     TCP_Server = new QTcpServer(this);
     connect(TCP_Server, &QTcpServer::newConnection, this, &MainWindow::newConnection);
+    qint16 port = 8080;
+    if (TCP_Server->listen(QHostAddress::Any, port)) {
+        log("=== Server started successfully on ===");
+        QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+        for (const QNetworkInterface &interface : interfaces) {
+            // 2. STAGE 1 FILTER: Interface must be up and actively running hardware
+            bool isUp = interface.flags().testFlag(QNetworkInterface::IsUp);
+            bool isRunning = interface.flags().testFlag(QNetworkInterface::IsRunning);
 
-    if (TCP_Server->listen(QHostAddress::Any, 8080)) {
-        log("=== Server started successfully on port 8080 ===");
+            if (!isUp || !isRunning) {
+                continue; // Skip if the cable is unplugged or interface is disabled
+            }
+            else
+            {
+                QList<QNetworkAddressEntry> entries = interface.addressEntries();
+                for (const QNetworkAddressEntry &entry : entries) {
+                    QHostAddress ip = entry.ip();
+
+                    // 4. STAGE 2 FILTER: Skip internal lookback/localhost strings (127.0.0.1 / ::1)
+                    if (ip.isLoopback()) {
+                        continue;
+                    }
+
+                    // Determine if it's IPv4 or IPv6
+                    QString type = (ip.protocol() == QAbstractSocket::IPv4Protocol) ? "IPv4" : "IPv6";
+
+                    // Print the live details
+                    if(interface.humanReadableName() =="Wi-Fi" && type=="IPv4"){
+                        QString haddr = ip.toString();
+                        log("Address : " + haddr);
+
+                    }
+                }
+            }
+        }
+        log("Port : " + QString::number(port));
         statusBar()->showMessage("Server running on port 8080   |   0 clients connected");
     } else {
         log("!!! Server failed to start !!!");
