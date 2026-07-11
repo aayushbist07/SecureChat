@@ -27,7 +27,8 @@ private slots:
     void onSocketReadyRead();
     void onSocketDisconnected();
     void addlog(const QString &message);
-    // void addmessage(const QString &message);
+    void addmessage(const QString &username,const QString &message);
+
 
 private:
     Ui::ClientMainWindow *ui;

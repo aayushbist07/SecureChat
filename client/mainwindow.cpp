@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "bubblemessage.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -34,11 +35,16 @@ void ClientMainWindow::addlog(const QString &message)
     ui->systemLog->addItem(LogEntry);
     ui->systemLog->scrollToBottom();
 }
-
-// void ClientMainWindow::addmessage(const QString &message)
-// {
-
-// }
+void ClientMainWindow::addmessage(const QString &username,const QString &message){
+    QString time = QTime::currentTime().toString("hh:mm");
+    BubbleMessage *bubble = new BubbleMessage(username, message , time);
+    QListWidgetItem *item = new QListWidgetItem();
+    bubble->setMaximumWidth(400);
+    item->setSizeHint(bubble->sizeHint());//set the size btw
+    ui->Chatlist->addItem(item);
+    ui->Chatlist->setItemWidget(item,bubble);
+    ui->Chatlist->scrollToBottom();
+}
 
 
 // ─── Called by main() right after the window is constructed ──────────────────
@@ -193,7 +199,7 @@ void ClientMainWindow::on_sendButton_clicked()
     socket->write(QJsonDocument(pkt).toJson(QJsonDocument::Compact) + "\n");
 
     // Show our own message locally (we won't receive our own echo from the server)
-    ui->textEdit_ChatDisplay->append(line);
+    addmessage(myUsername,text);
     ui->lineEdit_ChatMsg->clear();
 }
 
