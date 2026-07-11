@@ -51,6 +51,7 @@ private slots:
     void Client_Disconnected();
 
 private:
+    bool onNewAuthRequest(QTcpSocket* socket, QString username);
     void Add_New_Client_Connection(QTcpSocket *socket);
     void sendLeaderUpdatedDirectory();
     void refreshUserDisplay();
