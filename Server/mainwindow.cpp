@@ -16,7 +16,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     TCP_Server = new QTcpServer(this);
     connect(TCP_Server, &QTcpServer::newConnection, this, &MainWindow::newConnection);
+    //listening at 8080
     qint16 port = 8080;
+
     if (TCP_Server->listen(QHostAddress::Any, port)) {
         log("=== Server started successfully on ===");
         QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
@@ -51,7 +53,10 @@ MainWindow::MainWindow(QWidget *parent)
             }
         }
         log("Port : " + QString::number(port));
+        //firing the beacon including our local ip (where our server is started)
+        discoveryBeacon = new ServerDiscoveryBeacon(port, this);
         statusBar()->showMessage("Server running on port 8080   |   0 clients connected");
+
     } else {
         log("!!! Server failed to start !!!");
         statusBar()->showMessage("Server failed to start");

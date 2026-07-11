@@ -9,6 +9,7 @@
 #include <QMutex>
 #include <QUdpSocket>
 #include <QTimer>
+#include "ServerDiscoveryBeacon.h"
 
 enum PacketType {
     LEADER_KEY_SETUP = 101,
@@ -62,10 +63,12 @@ private:
     QMap<QString, ClientInfo *> UserRegistry;
     QString leaderUsername;
 
-    QMap<QTcpSocket*, QString> socketToUsername; // ✅ moved inside class
+    QMap<QTcpSocket*, QString> socketToUsername; // moved inside class
 
     const int DH_P = 23;
     const int DH_G = 5;
+    QTcpServer *tcpServer;
+    ServerDiscoveryBeacon *discoveryBeacon;
 };
 
 #endif // MAINWINDOW_H

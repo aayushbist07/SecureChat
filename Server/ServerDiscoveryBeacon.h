@@ -1,12 +1,13 @@
-// ServerDiscoveryBeacon.h
-#pragma once
+#ifndef SERVERDISCOVERYBEACON_H
+#define SERVERDISCOVERYBEACON_H
+
 #include <QObject>
 #include <QUdpSocket>
 #include <QTimer>
 #include <QNetworkInterface>
 #include <QJsonDocument>
 #include <QJsonObject>
-
+#include <QDebug>
 class ServerDiscoveryBeacon : public QObject {
     Q_OBJECT
 private:
@@ -23,10 +24,10 @@ private:
                 !interface.flags().testFlag(QNetworkInterface::IsRunning)) {
                 continue;
             }
-
+            //only if they are actively running this block of code is executed.
             for (const QNetworkAddressEntry &entry : interface.addressEntries()) {
                 QHostAddress ip = entry.ip();
-                // Filter out loopback and look for a standard IPv4 address
+                // Filter out loopback(via localhost) and look for a standard IPv4 address(via wifi)
                 if (!ip.isLoopback() && ip.protocol() == QAbstractSocket::IPv4Protocol) {
                     return ip.toString();
                 }
@@ -41,13 +42,13 @@ public:
     {
         udpSocket = new QUdpSocket(this);
         broadcastTimer = new QTimer(this);
-
         connect(broadcastTimer, &QTimer::timeout, this, &ServerDiscoveryBeacon::sendBeacon);
         broadcastTimer->start(2000); // Send beacon every 2 seconds
     }
 
 private slots:
     void sendBeacon() {
+        qDebug() <<"Fired the beacon boom";
         QString currentIp = getActiveServerIp();
 
         // Package both values cleanly using JSON
@@ -63,3 +64,6 @@ private slots:
         udpSocket->writeDatagram(datagram, QHostAddress::Broadcast, 9999);
     }
 };
+
+#endif
+

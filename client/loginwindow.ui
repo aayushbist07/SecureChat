@@ -465,6 +465,9 @@ border-radius:10px;</string>
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="QListWidget" name="listWidget"/>
+      </item>
      </layout>
     </widget>
    </item>
