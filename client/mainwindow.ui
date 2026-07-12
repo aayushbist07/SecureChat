@@ -26,7 +26,7 @@
    <property name="styleSheet">
     <string notr="true">background-color:black;</string>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_6">
+   <layout class="QHBoxLayout" name="horizontalLayout_6">
     <item>
      <widget class="QFrame" name="Window">
       <property name="styleSheet">
@@ -551,20 +551,26 @@ background-color:none;</string>
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_7">
                   <item>
-                   <widget class="QTextEdit" name="textEdit_ChatDisplay">
-                    <property name="layoutDirection">
-                     <enum>Qt::LayoutDirection::LeftToRight</enum>
+                   <widget class="QListWidget" name="Chatlist">
+                    <property name="focusPolicy">
+                     <enum>Qt::FocusPolicy::NoFocus</enum>
                     </property>
                     <property name="styleSheet">
-                     <string notr="true">border-radius:0px;
-border-top: 1px solid #2A3445;
-border-bottom:none;
-border-left:none;
-border-right:none;
-</string>
+                     <string notr="true">QListWidget{	
+border-radius:0px;
+	border-top: 1px solid #2A3445;
+	border-bottom:none;
+	border-left:none;
+	border-right:none;
+}
+
+QListWidget::item {
+    border: none;
+    margin: 6px;
+}</string>
                     </property>
-                    <property name="readOnly">
-                     <bool>true</bool>
+                    <property name="selectionMode">
+                     <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
                     </property>
                    </widget>
                   </item>
@@ -828,6 +834,30 @@ QPushButton#sendButton:pressed {
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="textEdit_ChatDisplay">
+      <property name="maximumSize">
+       <size>
+        <width>0</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LayoutDirection::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:0px;
+border-top: 1px solid #2A3445;
+border-bottom:none;
+border-left:none;
+border-right:none;
+</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
    </layout>

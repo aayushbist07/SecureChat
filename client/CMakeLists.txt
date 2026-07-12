@@ -25,6 +25,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         loginwindow.h loginwindow.cpp loginwindow.ui
         resource.qrc
         serverdiscoverer.h
+        bubblemessage.ui
+        bubblemessage.h
+        bubblemessage.cpp
+
     )
 else()
     if(ANDROID)
