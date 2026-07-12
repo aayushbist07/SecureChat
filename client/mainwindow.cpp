@@ -35,14 +35,32 @@ void ClientMainWindow::addlog(const QString &message)
     ui->systemLog->addItem(LogEntry);
     ui->systemLog->scrollToBottom();
 }
-void ClientMainWindow::addmessage(const QString &username,const QString &message){
+
+void ClientMainWindow::addmessage(const QString &username,const QString &message , bool check){
     QString time = QTime::currentTime().toString("hh:mm");
     BubbleMessage *bubble = new BubbleMessage(username, message , time);
-    QListWidgetItem *item = new QListWidgetItem();
     bubble->setMaximumWidth(400);
-    item->setSizeHint(bubble->sizeHint());//set the size btw
+    //creating a another widget and allign in accounding to it
+    QWidget *holder = new QWidget;
+    QHBoxLayout *layout = new QHBoxLayout(holder);
+    layout->setContentsMargins(5,5,5,5);//width , height , x , y
+    if(!check)
+    {
+        layout->addWidget(bubble);
+        layout->addStretch();
+    }
+    else {
+        layout->addStretch();
+        layout->addWidget(bubble);
+    }
+
+
+    QListWidgetItem *item = new QListWidgetItem();
+    bubble->adjustSize();
+    holder->adjustSize();
+    item->setSizeHint(holder->sizeHint());//set the size btw
     ui->Chatlist->addItem(item);
-    ui->Chatlist->setItemWidget(item,bubble);
+    ui->Chatlist->setItemWidget(item,holder);
     ui->Chatlist->scrollToBottom();
 }
 
@@ -165,6 +183,13 @@ void ClientMainWindow::onSocketReadyRead()
             if (roomKeyReady) {
                 // Payload is hex-encoded ciphertext — decrypt it
                 QString plaintext = cryptoEngine.decryptChatMessage(payload.toUtf8());
+                //extract the username and message from plaintext(genius who even encrypt username???)
+                int end = plaintext.indexOf("]:");
+                QString incoming_username = plaintext.mid(1,end-1);
+                QString incoming_message = plaintext.mid(end+3);
+                addmessage(incoming_username,incoming_message,0);
+
+
                 ui->textEdit_ChatDisplay->append(plaintext);
             } else {
                 // No key yet (e.g. server admin message sent before key exchange)
@@ -199,7 +224,7 @@ void ClientMainWindow::on_sendButton_clicked()
     socket->write(QJsonDocument(pkt).toJson(QJsonDocument::Compact) + "\n");
 
     // Show our own message locally (we won't receive our own echo from the server)
-    addmessage(myUsername,text);
+    addmessage(myUsername,text,1);
     ui->lineEdit_ChatMsg->clear();
 }
 
