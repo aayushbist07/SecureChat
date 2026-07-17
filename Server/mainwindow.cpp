@@ -119,6 +119,22 @@ void MainWindow::sendUserList()
     }
 }
 
+void MainWindow::kickUser(QString username)
+{
+    if(!UserRegistry.contains(username))
+        return;
+    QTcpSocket *targetSocket = UserRegistry[username]->socket;
+    QJsonObject kickinfo;
+    kickinfo["type"] = 108;
+    kickinfo["message"] = "You were kick by ";
+    QByteArray data = QJsonDocument(kickinfo).toJson(QJsonDocument::Compact) + "\n";
+    targetSocket->write(data);
+    targetSocket->flush();
+        targetSocket->waitForBytesWritten(1000);
+    qDebug() << "Thor Hammer Hits: " <<username;
+    targetSocket->disconnectFromHost();
+}
+
 // Appends a line to the main server message log in the center panel
 void MainWindow::log(const QString &text)
 {
@@ -183,6 +199,7 @@ void MainWindow::Read_Data_From_Socket()
 
     while (socket->canReadLine()) {
         QByteArray cleanPacket = socket->readLine().trimmed();
+        qDebug() << "Packet:" << cleanPacket;
         if (cleanPacket.isEmpty()) continue;
 
         QJsonParseError parseError;
@@ -195,6 +212,7 @@ void MainWindow::Read_Data_From_Socket()
 
         QJsonObject json = doc.object();
         int messageType = json["type"].toInt();
+       qDebug() << "messageType =" << messageType;
 
 
         //  CLIENT REGISTRATION (ADMIN APPROVAL HERE)
@@ -292,9 +310,24 @@ void MainWindow::Read_Data_From_Socket()
                 }
             }
 
+
             log("🔑 Keys distributed");
         }
+        else if(messageType == KICK_REQUEST)
+        {
+            QString sender = socketToUsername.value(socket);
+            if(sender!=leaderUsername)
+            {
+                qDebug() << "Not the leader!:" << sender;
+                continue;
+            }
+            QString main_target = json["target"].toString();
+            qDebug() << "Kick request form :" <<sender;
+            qDebug() << "Target : " << main_target;
+            kickUser(main_target);
+        }
     }
+
 }
 // ─── Leader directory push ─────────────────────────────────────────────────────
 

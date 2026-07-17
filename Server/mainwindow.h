@@ -17,7 +17,9 @@ enum PacketType {
     NORMAL_MESSAGE = 1,
     DIRECTORY_UPDATE = 104,
     KEY_DISTRIBUTION = 105,
-    USER_LIST = 106
+    USER_LIST = 106,
+    KICK_REQUEST = 107,
+    KICK_NOTIFICATION =108
 };
 
 QT_BEGIN_NAMESPACE
@@ -59,6 +61,7 @@ private:
     void log(const QString &text);
     void logEvent(const QString &text);
     void sendUserList();//this send the list to the client
+    void kickUser(QString username);
 private:
     Ui::MainWindow *ui;
     QTcpServer *TCP_Server;
