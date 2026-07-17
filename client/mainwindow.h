@@ -15,6 +15,7 @@ QT_END_NAMESPACE
 class ClientMainWindow : public QMainWindow
 {
     Q_OBJECT
+    QString currentLeader;
 
 public:
     explicit ClientMainWindow(QWidget *parent = nullptr);
@@ -28,9 +29,8 @@ private slots:
     void onSocketReadyRead();
     void onSocketDisconnected();
     void addmessage(const QString &username,const QString &message , bool check);
-
-
     void on_pushButton_SystemLog_clicked();
+    void showUserMenu(const QPoint &pos);//it show the menu
 
 private:
     Ui::ClientMainWindow *ui;

@@ -6,6 +6,8 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QMessageBox>
+#include <QMenu> //this make the menu when u right click it
+#include <QAction>
 //boilerplate codes and ui connections
 ClientMainWindow::ClientMainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,6 +19,11 @@ ClientMainWindow::ClientMainWindow(QWidget *parent)
 
     connect(socket, &QTcpSocket::readyRead,    this, &ClientMainWindow::onSocketReadyRead);
     connect(socket, &QTcpSocket::disconnected, this, &ClientMainWindow::onSocketDisconnected);
+    //Right_Click on member list
+    connect(ui->listwidget_userlist,
+            &QListWidget::customContextMenuRequested,
+            this,&ClientMainWindow::showUserMenu);
+
 
     // Disable send until the room key is negotiated
     ui->sendButton->setEnabled(false);
@@ -195,19 +202,26 @@ void ClientMainWindow::onSocketReadyRead()
         else if(type==106)
         {
              QJsonArray users = json["users"].toArray();
-             QString GroupLeader = json["leader"].toString();
+              currentLeader = json["leader"].toString();
              ui->listwidget_userlist->clear();//when server sends a new list
              //loop through the list send by the server
 
                  for(const QJsonValue &name : users)
              {
                  QString client_username = name.toString();
-                 if(client_username == GroupLeader) // just insert a king emoji at right side
+                 if(client_username == currentLeader) // just insert a king emoji at right side
                  {
                      client_username +=" 👑";
                  }
                    ui->listwidget_userlist->addItem(client_username);
              }
+
+         }
+        else if(type==108)
+        {
+            QString reason = json["message"].toString() + currentLeader;
+             QMessageBox::warning(this , "Removed from room" , reason);
+            systemlog->addlog("⚠" + reason);
 
          }
     }
@@ -251,11 +265,43 @@ void ClientMainWindow::onSocketDisconnected()
     ui->lineEdit_ChatMsg->setPlaceholderText("Disconnected from server.");
     systemlog->addlog("❌  Connection closed by server.");
     // ui->textEdit_Log->append("❌  Connection closed by server.");
-    ui->label_IdentityDisplay->setText(ui->label_IdentityDisplay->text() + "  |  ⚠ Disconnected");
+    ui->label_IdentityDisplay->setText(ui->label_IdentityDisplay->text() + "  |  ⚠ Disconnected");    
 }
 
 void ClientMainWindow::on_pushButton_SystemLog_clicked()
 {
     systemlog->show();
+}
+
+void ClientMainWindow::showUserMenu(const QPoint &pos)
+{
+
+    if(myUsername != currentLeader) return;
+     QListWidgetItem *item =
+    ui->listwidget_userlist->itemAt(pos);
+    if(item == nullptr) return;
+    if(item->text().contains("👑")) return;
+    QMenu menu(this);
+    QAction *kick = menu.addAction("Kick");
+    QAction *selected =
+         menu.exec(ui->listwidget_userlist->viewport()->mapToGlobal(pos));
+    if(selected == kick)
+    {
+        qDebug()<<"I am clicked";
+
+        QJsonObject json;
+        json["type"] = 107;
+        json["target"] = item->text();
+        QJsonDocument doc(json);
+
+        QByteArray packet = doc.toJson(QJsonDocument::Compact) + "\n";
+
+        qDebug() << "Sending:" << packet;
+
+        qint64 bytes = socket->write(packet);
+        qDebug() << "Bytes written:" << bytes;
+
+        socket->flush();
+    }
 }
 
