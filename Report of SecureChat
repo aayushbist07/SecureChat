@@ -1,5 +1,7 @@
 \documentclass[12pt,a4paper]{report}
 
+
+
 \usepackage[a4paper,margin=1in]{geometry}
 \usepackage{graphicx}
 \usepackage{setspace}
@@ -11,11 +13,15 @@
 \usepackage[T1]{fontenc}
 \usepackage{chngcntr}
 
+
+
 % Better typography
 \usepackage{microtype}
 
+
 % Disable automatic word hyphenation
 \usepackage[none]{hyphenat}
+
 
 \onehalfspacing
 
@@ -676,4 +682,6 @@ The project also demonstrated the use of the Diffie--Hellman key exchange algori
 \item Academic Project - SyncStream by yadunand-kamath. Available: \url{https://github.com/yadunand-kamath/SyncStream}
 
 \end{enumerate}
+
+
 \end{document}
