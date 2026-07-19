@@ -7,6 +7,9 @@
 #include <QListWidgetItem>
 #include <QNetworkInterface>
 #include <QNetworkAddressEntry>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QAbstractButton>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -70,6 +73,24 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+bool MainWindow::onNewAuthRequest(QTcpSocket* socket, QString username)
+{
+    QMessageBox msgBox;
+    msgBox.setText("Allow user: " + username + "?");
+
+    QPushButton* allow = msgBox.addButton("Allow", QMessageBox::AcceptRole);
+    QPushButton* deny  = msgBox.addButton("Deny", QMessageBox::RejectRole);
+
+    msgBox.exec();
+
+    if (msgBox.clickedButton() == allow)
+        return true;
+    else
+        return false;
+}
+
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 // Appends a timestamped line to the compact event log on the left panel
@@ -77,6 +98,41 @@ void MainWindow::logEvent(const QString &text)
 {
     QString ts = QDateTime::currentDateTime().toString("hh:mm");
     ui->textEdit_Event_Log->append(QString("[%1] %2").arg(ts, text));
+}
+
+void MainWindow::sendUserList()
+{
+    /*So we alr have the data stored in UserRegistry so i just send that same data */
+    QJsonObject packet;
+    packet["type"] = USER_LIST;
+    packet["leader"] = leaderUsername;
+    QJsonArray users;
+    for(auto it = UserRegistry.cbegin(); it!=UserRegistry.cend();it++)
+    {
+        users.append(it.key());
+    }
+    packet["users"] = users;
+    QByteArray data = QJsonDocument(packet).toJson(QJsonDocument::Compact) + "\n";
+    for(auto client: UserRegistry)
+    {
+        client->socket->write(data);
+    }
+}
+
+void MainWindow::kickUser(QString username)
+{
+    if(!UserRegistry.contains(username))
+        return;
+    QTcpSocket *targetSocket = UserRegistry[username]->socket;
+    QJsonObject kickinfo;
+    kickinfo["type"] = 108;
+    kickinfo["message"] = "You were kick by ";
+    QByteArray data = QJsonDocument(kickinfo).toJson(QJsonDocument::Compact) + "\n";
+    targetSocket->write(data);
+    targetSocket->flush();
+        targetSocket->waitForBytesWritten(1000);
+    qDebug() << "Thor Hammer Hits: " <<username;
+    targetSocket->disconnectFromHost();
 }
 
 // Appends a line to the main server message log in the center panel
@@ -136,7 +192,6 @@ void MainWindow::Add_New_Client_Connection(QTcpSocket *socket)
 }
 
 // ─── Incoming data ─────────────────────────────────────────────────────────────
-
 void MainWindow::Read_Data_From_Socket()
 {
     QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
@@ -144,6 +199,7 @@ void MainWindow::Read_Data_From_Socket()
 
     while (socket->canReadLine()) {
         QByteArray cleanPacket = socket->readLine().trimmed();
+        qDebug() << "Packet:" << cleanPacket;
         if (cleanPacket.isEmpty()) continue;
 
         QJsonParseError parseError;
@@ -154,16 +210,28 @@ void MainWindow::Read_Data_From_Socket()
             continue;
         }
 
-        QJsonObject json    = doc.object();
+        QJsonObject json = doc.object();
         int messageType = json["type"].toInt();
+       qDebug() << "messageType =" << messageType;
 
-        // ── Type 102: Client registration ────────────────────────────────
+
+        //  CLIENT REGISTRATION (ADMIN APPROVAL HERE)
+
         if (messageType == CLIENT_REGISTRATION) {
-            QString name      = json["username"].toString();
-            int clientPubKey  = json["public_key"].toInt();
+
+            QString name = json["username"].toString();
+            int clientPubKey = json["public_key"].toInt();
 
             if (name.isEmpty()) continue;
 
+            // 🔐 ADMIN APPROVAL
+            if (!onNewAuthRequest(socket, name)) {
+                log("❌ Rejected: " + name);
+                socket->disconnectFromHost();
+                return;
+            }
+
+            // ✅ REGISTER USER
             if (UserRegistry.contains(name)) {
                 ClientInfo *oldInfo = UserRegistry.take(name);
                 if (oldInfo) {
@@ -172,68 +240,95 @@ void MainWindow::Read_Data_From_Socket()
                 }
             }
 
-            ClientInfo *info  = new ClientInfo();
-            info->username    = name;
-            info->socket      = socket;
-            info->publicKey   = clientPubKey;
+            ClientInfo *info = new ClientInfo();
+            info->username  = name;
+            info->socket    = socket;
+            info->publicKey = clientPubKey;
+
             UserRegistry[name] = info;
             socketToUsername[socket] = name;
 
-            log(QString("Registered: %1 (key: %2)").arg(name).arg(clientPubKey));
-            logEvent(name + " connected");
+            log(QString("✔ Registered: %1").arg(name));
 
             if (leaderUsername.isEmpty() || !UserRegistry.contains(leaderUsername)) {
                 leaderUsername = name;
-                log(QString("+++ Leader appointed: %1 +++").arg(leaderUsername));
-                logEvent(name + " appointed leader");
+                log("👑 Leader: " + leaderUsername);
             }
 
             refreshUserDisplay();
             sendLeaderUpdatedDirectory();
+            sendUserList();//send the data when connecting
         }
-        //Message type 101 normal
-        else if (messageType == NORMAL_MESSAGE){
+
+
+        // 💬 NORMAL MESSAGE
+
+        else if (messageType == NORMAL_MESSAGE) {
+
+            if (!socketToUsername.contains(socket)) {
+                log("⚠ Unauthorized message blocked");
+                continue;
+            }
+
             QByteArray forwardPacket =
                 QJsonDocument(json).toJson(QJsonDocument::Compact) + "\n";
 
-            for (auto client : UserRegistry.values())
-            {
-                if (client->socket != socket) // don't echo back to sender
-                {
+            for (auto client : UserRegistry.values()) {
+                if (client->socket != socket) {
                     client->socket->write(forwardPacket);
                 }
             }
 
-            log(QString("[CHAT] Relayed encrypted message"));
+            log("[CHAT] Message relayed");
         }
 
-        // ── Type KEY_DISTRIBUTION : Leader distributes encrypted session keys ───────────
+        //  KEY DISTRIBUTION
         else if (messageType == KEY_DISTRIBUTION) {
-            int leaderPubKey          = json["leader_public_key"].toInt();
-            QJsonArray keyPayloads    = json["key_payloads"].toArray();
 
-            log("Leader delivered key bundles. Routing...");
+            if (!socketToUsername.contains(socket)) {
+                log("⚠ Unauthorized key distribution blocked");
+                continue;
+            }
 
-            for (int i = 0; i < keyPayloads.size(); ++i) {
-                QJsonObject payload      = keyPayloads[i].toObject();
-                QString targetUser       = payload["target_user"].toString();
-                QString encryptedKeyHex  = payload["encrypted_key"].toString();
+            int leaderPubKey = json["leader_public_key"].toInt();
+            QJsonArray keyPayloads = json["key_payloads"].toArray();
+
+            for (const QJsonValue &val : keyPayloads) {
+                QJsonObject payload = val.toObject();
+                QString targetUser = payload["target_user"].toString();
+                QString encryptedKeyHex = payload["encrypted_key"].toString();
 
                 if (UserRegistry.contains(targetUser)) {
                     QJsonObject dispatchPacket;
-                    dispatchPacket["type"]             = KEY_DISTRIBUTION;
+                    dispatchPacket["type"] = KEY_DISTRIBUTION;
                     dispatchPacket["leader_public_key"] = leaderPubKey;
-                    dispatchPacket["encrypted_key"]    = encryptedKeyHex;
+                    dispatchPacket["encrypted_key"] = encryptedKeyHex;
 
                     UserRegistry[targetUser]->socket->write(
                         QJsonDocument(dispatchPacket).toJson(QJsonDocument::Compact) + "\n"
-                    );
+                        );
                 }
             }
+
+
+            log("🔑 Keys distributed");
+        }
+        else if(messageType == KICK_REQUEST)
+        {
+            QString sender = socketToUsername.value(socket);
+            if(sender!=leaderUsername)
+            {
+                qDebug() << "Not the leader!:" << sender;
+                continue;
+            }
+            QString main_target = json["target"].toString();
+            qDebug() << "Kick request form :" <<sender;
+            qDebug() << "Target : " << main_target;
+            kickUser(main_target);
         }
     }
-}
 
+}
 // ─── Leader directory push ─────────────────────────────────────────────────────
 
 void MainWindow::sendLeaderUpdatedDirectory()
@@ -292,6 +387,7 @@ void MainWindow::Client_Disconnected()
         }
 
         refreshUserDisplay();
+        sendUserList();//send when user is out
     } else {
         socket->deleteLater();
     }

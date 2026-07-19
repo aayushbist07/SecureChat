@@ -1,19 +1,29 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "bubblemessage.h"
+#include "systemlogdialog.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QMessageBox>
+#include <QMenu> //this make the menu when u right click it
+#include <QAction>
 //boilerplate codes and ui connections
 ClientMainWindow::ClientMainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::ClientMainWindow)
 {
     ui->setupUi(this);
+    systemlog = new SystemLogDialog(this);
     socket = new QTcpSocket(this);
 
     connect(socket, &QTcpSocket::readyRead,    this, &ClientMainWindow::onSocketReadyRead);
     connect(socket, &QTcpSocket::disconnected, this, &ClientMainWindow::onSocketDisconnected);
+    //Right_Click on member list
+    connect(ui->listwidget_userlist,
+            &QListWidget::customContextMenuRequested,
+            this,&ClientMainWindow::showUserMenu);
+
 
     // Disable send until the room key is negotiated
     ui->sendButton->setEnabled(false);
@@ -26,19 +36,35 @@ ClientMainWindow::~ClientMainWindow()
     delete ui;
 }
 
-void ClientMainWindow::addlog(const QString &message)
-{
-    QString time  =  QTime::currentTime().toString("hh:mm:ss");
-    QString LogEntry = QString("[%1] %2").arg(time,message);
 
-    ui->systemLog->addItem(LogEntry);
-    ui->systemLog->scrollToBottom();
+
+void ClientMainWindow::addmessage(const QString &username,const QString &message , bool check){
+    QString time = QTime::currentTime().toString("hh:mm");
+    BubbleMessage *bubble = new BubbleMessage(username, message , time);
+    bubble->setMaximumWidth(400);
+    //creating a another widget and allign in accounding to it
+    QWidget *holder = new QWidget;
+    QHBoxLayout *layout = new QHBoxLayout(holder);
+    layout->setContentsMargins(5,5,5,5);//width , height , x , y
+    if(!check)
+    {
+        layout->addWidget(bubble);
+        layout->addStretch();
+    }
+    else {
+        layout->addStretch();
+        layout->addWidget(bubble);
+    }
+
+
+    QListWidgetItem *item = new QListWidgetItem();
+    bubble->adjustSize();
+    holder->adjustSize();
+    item->setSizeHint(holder->sizeHint());//set the size btw
+    ui->Chatlist->addItem(item);
+    ui->Chatlist->setItemWidget(item,holder);
+    ui->Chatlist->scrollToBottom();
 }
-
-// void ClientMainWindow::addmessage(const QString &message)
-// {
-
-// }
 
 
 // ─── Called by main() right after the window is constructed ──────────────────
@@ -49,19 +75,19 @@ void ClientMainWindow::setSessionUsername(const QString& username,const QString&
     setWindowTitle("SecureChat — " + myUsername);
     ui->label_IdentityDisplay->setText(myUsername);
     QString message = "Connecting to" + HAddr + ":8080";
-    addlog(message);
+    systemlog->addlog(message);
 
     //calls connectToHost for the QTcpSocket object.
     socket->connectToHost(HAddr, 8080);
 
     //checking if the server is listening for new clients.
     if (!socket->waitForConnected(3000)) {
-        addlog("❌  Cannot reach server. Start the Server app first, then relaunch the client.");
+        systemlog->addlog("❌  Cannot reach server. Start the Server app first, then relaunch the client.");
         // ui->textEdit_Log->append("❌  Cannot reach server. Start the Server app first, then relaunch the client.");
-        addlog("Logged in as:  " + myUsername + "  |  ⚠ Offline");
+        systemlog->addlog("Logged in as:  " + myUsername + "  |  ⚠ Offline");
         // ui->label_IdentityDisplay->setText("Logged in as:  " + myUsername + "  |  ⚠ Offline");
     } else {
-        addlog("✔  Connected. Waiting for handshake...");
+        systemlog->addlog("✔  Connected. Waiting for handshake...");
         // ui->textEdit_Log->append("✔  Connected. Waiting for handshake...");
     }
 }
@@ -83,7 +109,7 @@ void ClientMainWindow::onSocketReadyRead()
         QJsonDocument doc = QJsonDocument::fromJson(clean, &err);
         //checking for parsing errors:
         if (err.error != QJsonParseError::NoError || doc.isNull()) {
-            addlog("⚠  Dropped malformed packet.");
+            systemlog->addlog("⚠  Dropped malformed packet.");
             // ui->textEdit_Log->append("⚠  Dropped malformed packet.");
             continue;
         }
@@ -104,20 +130,20 @@ void ClientMainWindow::onSocketReadyRead()
             reg["public_key"] = myPubKey;
             //sending back public key to enable secrete messagaing.
             socket->write(QJsonDocument(reg).toJson(QJsonDocument::Compact) + "\n");
-            addlog(QString(QString("🔑  DH handshake done. Public key: %1").arg(myPubKey)));
+            systemlog->addlog(QString(QString("🔑  DH handshake done. Public key: %1").arg(myPubKey)));
             // ui->textEdit_Log->append(QString("🔑  DH handshake done. Public key: %1").arg(myPubKey));
         }
 
         // ── Packet 104: We are the room leader — generate & distribute keys ─
         else if (type == 104) {
-            addlog("⭐  You are the room leader. Generating session keys...");
+            systemlog->addlog("⭐  You are the room leader. Generating session keys...");
             // ui->textEdit_Log->append("⭐  You are the room leader. Generating session keys...");
             QJsonArray peers = json["participants"].toArray();
 
             if (peers.isEmpty()) {
                 // Leader is alone; generate a key for ourselves so we can chat
                 // when peers join later the key will be re-sent automatically.
-                addlog("ℹ  No peers yet. Key will be distributed when others join.");
+                systemlog->addlog("ℹ  No peers yet. Key will be distributed when others join.");
                 // ui->textEdit_Log->append("ℹ  No peers yet. Key will be distributed when others join.");
                 // Generate room key locally so leader can still type when alone
                 cryptoEngine.generateRawRoomKey();
@@ -133,7 +159,7 @@ void ClientMainWindow::onSocketReadyRead()
                 ui->sendButton->setEnabled(true);
                 ui->lineEdit_ChatMsg->setEnabled(true);
                 ui->lineEdit_ChatMsg->setPlaceholderText("Type a message...");
-                addlog(QString("✔  Session keys sent to %1 peer(s).").arg(peers.size()));
+                systemlog->addlog(QString("✔  Session keys sent to %1 peer(s).").arg(peers.size()));
                 // ui->textEdit_Log->append(QString("✔  Session keys sent to %1 peer(s).").arg(peers.size()));
             }
         }
@@ -148,7 +174,7 @@ void ClientMainWindow::onSocketReadyRead()
             ui->sendButton->setEnabled(true);
             ui->lineEdit_ChatMsg->setEnabled(true);
             ui->lineEdit_ChatMsg->setPlaceholderText("Type a message...");
-            addlog("🔒  Session key received. Chat is now encrypted.");
+            systemlog->addlog("🔒  Session key received. Chat is now encrypted.");
             // ui->textEdit_Log->append("🔒  Session key received. Chat is now encrypted.");
         }
 
@@ -159,12 +185,45 @@ void ClientMainWindow::onSocketReadyRead()
             if (roomKeyReady) {
                 // Payload is hex-encoded ciphertext — decrypt it
                 QString plaintext = cryptoEngine.decryptChatMessage(payload.toUtf8());
+                //extract the username and message from plaintext(genius who even encrypt username???)
+                int end = plaintext.indexOf("]:");
+                QString incoming_username = plaintext.mid(1,end-1);
+                QString incoming_message = plaintext.mid(end+3);
+                addmessage(incoming_username,incoming_message,0);
+
+
                 ui->textEdit_ChatDisplay->append(plaintext);
             } else {
                 // No key yet (e.g. server admin message sent before key exchange)
                 ui->textEdit_ChatDisplay->append("[unencrypted] " + payload);
             }
         }
+
+        else if(type==106)
+        {
+             QJsonArray users = json["users"].toArray();
+              currentLeader = json["leader"].toString();
+             ui->listwidget_userlist->clear();//when server sends a new list
+             //loop through the list send by the server
+
+                 for(const QJsonValue &name : users)
+             {
+                 QString client_username = name.toString();
+                 if(client_username == currentLeader) // just insert a king emoji at right side
+                 {
+                     client_username +=" 👑";
+                 }
+                   ui->listwidget_userlist->addItem(client_username);
+             }
+
+         }
+        else if(type==108)
+        {
+            QString reason = json["message"].toString() + currentLeader;
+             QMessageBox::warning(this , "Removed from room" , reason);
+            systemlog->addlog("⚠" + reason);
+
+         }
     }
 }
 
@@ -175,7 +234,7 @@ void ClientMainWindow::on_sendButton_clicked()
     if (text.isEmpty()) return;
     //checks if the encryption is done
     if (!roomKeyReady) {
-        addlog("⚠  Key not ready yet — please wait.");
+        systemlog->addlog("⚠  Key not ready yet — please wait.");
         // ui->textEdit_Log->append("⚠  Key not ready yet — please wait.");
         return;
     }
@@ -193,7 +252,7 @@ void ClientMainWindow::on_sendButton_clicked()
     socket->write(QJsonDocument(pkt).toJson(QJsonDocument::Compact) + "\n");
 
     // Show our own message locally (we won't receive our own echo from the server)
-    ui->textEdit_ChatDisplay->append(line);
+    addmessage(myUsername,text,1);
     ui->lineEdit_ChatMsg->clear();
 }
 
@@ -204,7 +263,45 @@ void ClientMainWindow::onSocketDisconnected()
     ui->sendButton->setEnabled(false);
     ui->lineEdit_ChatMsg->setEnabled(false);
     ui->lineEdit_ChatMsg->setPlaceholderText("Disconnected from server.");
-    addlog("❌  Connection closed by server.");
+    systemlog->addlog("❌  Connection closed by server.");
     // ui->textEdit_Log->append("❌  Connection closed by server.");
-    ui->label_IdentityDisplay->setText(ui->label_IdentityDisplay->text() + "  |  ⚠ Disconnected");
+    ui->label_IdentityDisplay->setText(ui->label_IdentityDisplay->text() + "  |  ⚠ Disconnected");    
 }
+
+void ClientMainWindow::on_pushButton_SystemLog_clicked()
+{
+    systemlog->show();
+}
+
+void ClientMainWindow::showUserMenu(const QPoint &pos)
+{
+
+    if(myUsername != currentLeader) return;
+     QListWidgetItem *item =
+    ui->listwidget_userlist->itemAt(pos);
+    if(item == nullptr) return;
+    if(item->text().contains("👑")) return;
+    QMenu menu(this);
+    QAction *kick = menu.addAction("Kick");
+    QAction *selected =
+         menu.exec(ui->listwidget_userlist->viewport()->mapToGlobal(pos));
+    if(selected == kick)
+    {
+        qDebug()<<"I am clicked";
+
+        QJsonObject json;
+        json["type"] = 107;
+        json["target"] = item->text();
+        QJsonDocument doc(json);
+
+        QByteArray packet = doc.toJson(QJsonDocument::Compact) + "\n";
+
+        qDebug() << "Sending:" << packet;
+
+        qint64 bytes = socket->write(packet);
+        qDebug() << "Bytes written:" << bytes;
+
+        socket->flush();
+    }
+}
+

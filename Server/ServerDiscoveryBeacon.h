@@ -48,7 +48,8 @@ public:
 
 private slots:
     void sendBeacon() {
-        qDebug() <<"Fired the beacon boom";
+        //this wasted my 20mins why this becon alway boom stupied
+        // qDebug() <<"Fired the beacon boom";
         QString currentIp = getActiveServerIp();
 
         // Package both values cleanly using JSON
