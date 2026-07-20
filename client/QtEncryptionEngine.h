@@ -20,7 +20,7 @@ private:
 public:
     QtEncryptionEngine() {
         // secure random private key gen
-        privateKey = QRandomGenerator::global()->bounded(1,100);
+    privateKey = QRandomGenerator::global()->generate64();
     }
 
     // creates a random 26-byte pool for symmetric encryption

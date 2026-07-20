@@ -71,8 +71,8 @@ private:
 
     QMap<QTcpSocket*, QString> socketToUsername; // moved inside class
 
-    const int DH_P = 23;
-    const int DH_G = 5;
+    const long long DH_P = 2305843009213693951LL;
+    const long long DH_G = 5;
     QTcpServer *tcpServer;
     ServerDiscoveryBeacon *discoveryBeacon;
 };
