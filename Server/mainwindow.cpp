@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
         statusBar()->showMessage("Server failed to start");
     }
 }
-
+// Destructor
 MainWindow::~MainWindow()
 {
     qDeleteAll(UserRegistry);
