@@ -1,36 +1,43 @@
 \documentclass[12pt,a4paper]{report}
 
-
-
 \usepackage[a4paper,margin=1in]{geometry}
+
 \usepackage{graphicx}
+
 \usepackage{setspace}
+
 \usepackage{titlesec}
+
 \usepackage{hyperref}
+
 \usepackage{float}
+
 \usepackage{amsmath}
+
 \usepackage{enumitem}
+
 \usepackage[T1]{fontenc}
+
 \usepackage{chngcntr}
-
-
 
 % Better typography
 \usepackage{microtype}
 
-
 % Disable automatic word hyphenation
 \usepackage[none]{hyphenat}
-
 
 \onehalfspacing
 
 % Reduce bad line breaks
+
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 \emergencystretch=3em
+
 % Number figures and tables by section
+
 \counterwithin{figure}{section}
+
 \counterwithin{table}{section}
 
 \begin{document}
@@ -42,6 +49,7 @@
 \pagenumbering{roman}
 
 \begin{titlepage}
+
 \thispagestyle{empty}
 
 \begin{center}
@@ -682,6 +690,5 @@ The project also demonstrated the use of the Diffie--Hellman key exchange algori
 \item Academic Project - SyncStream by yadunand-kamath. Available: \url{https://github.com/yadunand-kamath/SyncStream}
 
 \end{enumerate}
-
 
 \end{document}
