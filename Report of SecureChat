@@ -1,72 +1,44 @@
 \documentclass[12pt,a4paper]{report}
 
-
 \usepackage[a4paper,margin=1in]{geometry}
-
 
 \usepackage{graphicx}
 
-
 \usepackage{setspace}
-
 
 \usepackage{titlesec}
 
-
 \usepackage{hyperref}
-
 
 \usepackage{float}
 
-
 \usepackage{amsmath}
-
 
 \usepackage{enumitem}
 
-
 \usepackage[T1]{fontenc}
-
 
 \usepackage{chngcntr}
 
-
-
 % Better typography
-
 \usepackage{microtype}
 
-
 % Disable automatic word hyphenation
-
-
 \usepackage[none]{hyphenat}
-
 
 \onehalfspacing
 
-
 % Reduce bad line breaks
 
-
 \hyphenpenalty=10000
-
 \exhyphenpenalty=10000
-
 \emergencystretch=3em
-
-
 
 % Number figures and tables by section
 
-
 \counterwithin{figure}{section}
 
-
 \counterwithin{table}{section}
-
-
-
 
 \begin{document}
 
@@ -74,96 +46,59 @@
 % Title Page
 %----------------------%
 
-
-
-
 \pagenumbering{roman}
-
 
 \begin{titlepage}
 
-
 \thispagestyle{empty}
-
 
 \begin{center}
 
-
 \vspace*{1cm}
-
 
 {\Large\textbf{Kathmandu University}}
 
-
 \vspace{0.2cm}
-
 
 {\large\textbf{Department of Computer Science and Engineering}}
 
-
 \vspace{0.2cm}
-
 
 {\large Dhulikhel, Kavre}
 
-
 \vspace{0.8cm}
-
 
 \includegraphics[width=0.18\textwidth]{images/ku_logo.png}
 
-
 \vspace{0.8cm}
-
 
 {\Large\textbf{A Project Report}}
 
-
 \vspace{0.3cm}
-
 
 {\large on}
 
-
 \vspace{0.3cm}
-
 
 {\Large\textbf{SecureChat}}
 
-
 \vspace{0.2cm}
-
 
 {\large A Secure LAN-Based Messaging Application}
 
-
-
 \vspace{0.8cm}
-
-
 
 {\large\textbf{Course No.: ENGG 102}}
 
-
 \vspace{0.2cm}
-
-
 
 {\small (Submitted in Partial Fulfillment of the Requirements for Year I / Semester II in Computer Engineering)}
 
-
-
 \vspace{1cm}
-
-
 
 {\large\textbf{Submitted by}}
 
-
-
 \vspace{0.3cm}
-
-
 
 Maniraj Baral (26)\\
 Genius Bhandari (34)\\
@@ -171,45 +106,27 @@ Aayush Bist (43)\\
 Prajwal Chamlagain (45)\\
 Pratish Chaudhary (49)
 
-
-
 \vspace{1cm}
-
-
 
 {\large\textbf{Submitted to}}
 
-
 \vspace{0.3cm}
-
 
 Supervisor's Name\\
 Department of Computer Science and Engineering
 
-
 \vfill
-
 
 July 2026
 
-
 \end{center}
 
-
 \end{titlepage}
-
-
-
-
 
 
 %----------------------%
 % Abstract
 %----------------------%
-
-
-
-
 
 \chapter*{Abstract}
 
@@ -219,62 +136,27 @@ The application provides real-time messaging through a graphical user interface 
 
 The SecureChat application was successfully designed, implemented, and tested. The results show reliable communication between multiple clients in a LAN environment and provide a strong foundation for future enhancements such as end-to-end encryption, internet-based communication, and file sharing.
 
-
-
-
-
 \newpage
-
-
-
-
-
-
 %----------------------%
 % Table of Contents
 %----------------------%
 
-
-
 \tableofcontents
-
-
 \newpage
-
-
-
-
-
 
 %----------------------%
 % List of Figures
 %----------------------%
 
-
-
-
-
 \listoffigures
-
-
 \newpage
-
-
-
-
 
 %----------------------%
 % List of Tables
 %----------------------%
 
-
 \listoftables
-
-
-
 \newpage
-
-
 
 
 
@@ -293,13 +175,7 @@ TCP & Transmission Control Protocol \\
 UI & User Interface \\
 \end{tabular}
 
-
-
 \newpage
-
-
-
-
 
 
 %----------------------%
@@ -307,15 +183,8 @@ UI & User Interface \\
 %----------------------%
 
 \pagenumbering{arabic}
-
-
 \setcounter{page}{1}
-
-
 \chapter{Introduction}
-
-
-
 
 \section{Background}
 
@@ -678,12 +547,7 @@ The current encryption implementation has several limitations:
     \item Message integrity and authentication are not implemented.
     \item The repeating-key XOR cipher is not considered cryptographically secure for real-world applications.
     \item Advanced encryption algorithms such as AES have not been implemented.
-
-
-
 \end{itemize}
-
-
 \section{Client Implementation}
 
 The client application provides an interactive graphical interface through which users connect to the server and exchange messages. It communicates with the server using TCP sockets and updates the interface whenever new messages arrive.
@@ -776,16 +640,38 @@ TC-08 & Secure key exchange & Passed \\
 
 The SecureChat application was successfully implemented and tested. Multiple clients were able to connect to the server simultaneously and exchange messages in real time. The server correctly broadcast messages to all connected clients.
 
-The authentication mechanism worked as expected, and the Diffie--Hellman key exchange was successfully performed before communication. Automatic server discovery also simplified the connection process within the local network.
-\section{Performance Evaluation}
+Figure~\ref{fig:serverdashboard} shows the server dashboard during execution.
 
-The SecureChat application performed efficiently during testing in a Local Area Network (LAN) environment. Clients were able to connect to the server without significant delay, and messages were delivered to all connected users in real time.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/server_dashboard.jpeg}
+\caption{Server Dashboard}
+\label{fig:serverdashboard}
+\end{figure}
 
-The server successfully handled multiple client connections simultaneously while maintaining stable communication throughout the testing process. The broadcasting mechanism ensured that messages were received by all active clients without data loss.
+The authentication mechanism worked as expected, and users were able to join the chat room successfully using the login interface.
 
-The graphical user interface remained responsive during message exchange, allowing users to send and receive messages smoothly. The implementation of the Diffie--Hellman key exchange was also verified, demonstrating secure key establishment before communication.
+Figure~\ref{fig:loginwindow} shows the client login window.
 
-Overall, the application achieved reliable performance and satisfied the functional requirements defined for the project.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{images/login_window.jpeg}
+\caption{Client Login Window}
+\label{fig:loginwindow}
+\end{figure}
+
+After successful login, users entered the chat room where messages could be exchanged in real time. The member list and chat interface were updated correctly during communication.
+
+Figure~\ref{fig:chatwindow} shows the SecureChat main chat window.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/chat_window.jpeg}
+\caption{SecureChat Main Chat Window}
+\label{fig:chatwindow}
+\end{figure}
+
+The Diffie--Hellman key exchange was successfully performed before communication, and automatic server discovery simplified the connection process within the local network.
 \chapter{Project Planning and Management}
 
 \section{Introduction}
@@ -904,8 +790,5 @@ The project also demonstrated the use of the Diffie--Hellman key exchange algori
 \item Academic Project - SyncStream by yadunand-kamath. Available: \url{https://github.com/yadunand-kamath/SyncStream}
 
 \end{enumerate}
-
-
-
 
 \end{document}
