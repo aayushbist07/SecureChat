@@ -601,6 +601,89 @@ The server consists of the following components:
     \item \textbf{authmanager} -- Handles user authentication and authorization.
     \item \textbf{ServerDiscoveryBeacon} -- Allows clients to discover the server automatically within the local network.
 \end{itemize}
+\section{Encryption Implementation}
+
+To provide secure communication between clients, SecureChat uses a combination of the Diffie--Hellman (DH) key exchange algorithm, room key exchange, and XOR-based encryption. The objective is to ensure that messages remain confidential even though they are transmitted through the server. The server only forwards encrypted messages and does not know their actual contents.
+
+\subsection{Key Exchange (Diffie--Hellman)}
+
+When a client connects to the server, the server sends two public parameters: a large prime number ($p$) and a generator ($g$). Each client then generates its own private key locally using a random 64-bit integer generator provided by the Qt framework.
+
+Using these values, each client calculates its public key using the following equation:
+
+\[
+\text{Public Key} = g^{\text{Private Key}} \bmod p
+\]
+
+The calculated public key is then sent to the server, which distributes it to the other connected clients. All calculations are performed using the \texttt{long long} data type to reduce the possibility of precision errors.
+
+\subsection{Room Key Generation and Distribution}
+
+Instead of encrypting messages directly with the Diffie--Hellman shared secret, SecureChat generates a separate room key consisting of 26 randomly selected characters. This room key is created once by the room leader and shared securely with every participant.
+
+For each connected client, the room leader calculates a shared secret using the following equation:
+
+\[
+\text{Shared Secret} = (\text{Peer Public Key})^{\text{Leader Private Key}} \bmod p
+\]
+
+Because of the mathematical properties of the Diffie--Hellman algorithm, each client independently computes the same shared secret using the leader's public key and its own private key.
+
+The room leader encrypts the room key by applying the XOR operation with the shared secret before sending it to each client. The receiving client performs the same XOR operation using its computed shared secret to recover the original room key.
+
+\subsection{Message Encryption (XOR Cipher)}
+
+After all clients obtain the same room key, chat messages are encrypted using a repeating-key XOR cipher.
+
+The encryption process is represented by:
+
+\[
+C = P \oplus K
+\]
+
+where
+
+\begin{itemize}
+    \item $P$ = Plaintext
+    \item $K$ = Room Key
+    \item $C$ = Ciphertext
+\end{itemize}
+
+The original message is recovered using the same operation:
+
+\[
+P = C \oplus K
+\]
+
+Since the room key contains only 26 characters, it is repeated cyclically throughout the message:
+
+\[
+C[i] = P[i] \oplus K[i \bmod \text{Length}(K)]
+\]
+
+This method provides a simple demonstration of symmetric encryption for educational purposes.
+
+\subsection{Security Analysis}
+
+The Diffie--Hellman private key is generated randomly using a 64-bit integer, making brute-force attacks computationally difficult. Similarly, the 26-character room key provides a very large number of possible combinations, making random guessing highly impractical.
+
+Although the current implementation is intended primarily for educational purposes, it demonstrates the basic concepts of secure key exchange and encrypted communication between multiple users.
+
+\subsection{Limitations}
+
+The current encryption implementation has several limitations:
+
+\begin{itemize}
+    \item The application does not provide forward secrecy across different sessions.
+    \item Message integrity and authentication are not implemented.
+    \item The repeating-key XOR cipher is not considered cryptographically secure for real-world applications.
+    \item Advanced encryption algorithms such as AES have not been implemented.
+
+
+
+\end{itemize}
+
+
 \section{Client Implementation}
 
 The client application provides an interactive graphical interface through which users connect to the server and exchange messages. It communicates with the server using TCP sockets and updates the interface whenever new messages arrive.
